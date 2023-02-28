@@ -1,9 +1,11 @@
 import React, { useCallback, useState, useEffect } from "react";
 import axios from "../api/axios";
 import "./Row.css";
+import { MovieModal } from "./MovieModal/index";
 
 export default function Row({ title, id, fetchUrl }) {
   const [movies, setMovies] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const fetchMovieData = useCallback(async () => {
     const reponse = await axios.get(fetchUrl);
@@ -17,12 +19,25 @@ export default function Row({ title, id, fetchUrl }) {
     fetchMovieData();
   }, [fetchMovieData]);
 
+  const handleClick = (movie) => {
+    setModalOpen(true);
+  };
+  console.log(document.getElementById(id)); // 한 줄씩 잡아준다.
+  console.log(document.getElementById(id)?.scrollLeft);
+
   return (
     <div>
       <h2>{title}</h2>
       <div className="slider">
         <div className="slider__arrow-left">
-          <span className="arrow">{"<"}</span>
+          <span
+            className="arrow"
+            onClick={() => {
+              document.getElementById(id).scrollLeft -= window.innerWidth - 80;
+            }}
+          >
+            {"<"}
+          </span>
         </div>
         <div id={id} className="row__posters">
           {movies.map((movie) => (
@@ -31,13 +46,22 @@ export default function Row({ title, id, fetchUrl }) {
               className="row__poster"
               src={`https://image.tmdb.org/t/p/original${movie.backdrop_path}`}
               alt={movie.name}
+              onClick={() => handleClick(movie)}
             ></img>
           ))}
         </div>
         <div className="slider__arrow-right">
-          <span className="arrow">{">"}</span>
+          <span
+            className="arrow"
+            onClick={() => {
+              document.getElementById(id).scrollLeft += window.innerWidth - 80;
+            }}
+          >
+            {">"}
+          </span>
         </div>
       </div>
+      {/* {setModalOpen && <MovieModal></MovieModal>} */}
     </div>
   );
 }
